@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Split Bill</title>
+<style>
+:root{--bg:#f3f0ff;--fg:#1e1b4b;--mut:#6b6891;--card:#fff;--line:#e4e0f5;--pri:#38bdf8;--pri2:#0ea5e9;--bad:#e11d48;--ok:#059669;--sh:0 6px 18px rgba(76,29,149,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14112b;--fg:#ece9ff;--mut:#9d98c9;--card:#211c45;--line:#352f66;--bad:#fb7185;--ok:#34d399;--sh:0 6px 18px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#14112b;--fg:#ece9ff;--mut:#9d98c9;--card:#211c45;--line:#352f66;--bad:#fb7185;--ok:#34d399;--sh:0 6px 18px rgba(0,0,0,.4)}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,sans-serif}
+#app{max-width:480px;margin:0 auto;min-height:100vh}
+.pad{padding:16px 16px 100px}
+h1{font-size:22px;margin:10px 0 4px}h2{font-size:17px;margin:14px 0 8px}
+input,button{font:inherit;color:var(--fg)}
+input{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);margin:4px 0}
+input:focus{outline:2px solid var(--pri);border-color:transparent}
+button{border:0;cursor:pointer}
+.bt,.bs{width:100%;padding:13px;border-radius:999px;font-weight:700;margin-top:10px}
+.bt{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;box-shadow:0 6px 14px rgba(14,165,233,.35)}
+.bs{background:var(--card);border:1.5px solid var(--line)}
+.bt:disabled{opacity:.4;box-shadow:none}
+.ib{width:40px;height:40px;border-radius:50%;background:var(--card);box-shadow:var(--sh);font-size:18px}
+.sm{padding:6px 14px;border-radius:999px;background:var(--pri);color:#06283d;font-weight:700}
+.card{background:var(--card);border-radius:20px;padding:14px;margin:10px 0;box-shadow:var(--sh)}
+.mut{color:var(--mut);font-size:13px}.bad{color:var(--bad)}.ok{color:var(--ok)}
+.sp{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lb{display:block;font-weight:600;margin-top:12px}
+.hero{background:linear-gradient(160deg,#2e1065,#6d3fd6);color:#fff;padding:18px 0 22px;border-radius:0 0 28px 28px}
+.hero h1,.hero p{margin-left:16px;margin-right:16px}.hero p{margin-top:0;opacity:.8}
+.car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 16px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}
+.sl{flex:0 0 86%;scroll-snap-align:center;border-radius:22px;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:120px;cursor:pointer;color:#fff}
+.sl b{display:block;font-size:18px;margin-bottom:4px}.sl span{font-size:13px;opacity:.9}.sl em{font-size:52px;font-style:normal}
+.dots{display:flex;justify-content:center;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4)}.dots i.on{background:var(--pri);width:18px;border-radius:4px}
+.wl{display:flex;align-items:center;gap:12px;cursor:pointer}.wl div{flex:1}
+.avs{width:40px;height:40px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:22px;flex:none}
+.empty{text-align:center;padding:30px 10px;display:flex;flex-direction:column;gap:6px;color:var(--mut)}.empty em{font-size:48px;font-style:normal}.empty b{color:var(--fg)}
+.mr{display:flex;align-items:center;gap:10px;margin:6px 0}.mr input{margin:0}.mr .nm{flex:1;min-width:0;font-weight:600}.mr input[data-i]{width:130px;flex:none}
+.avb{width:48px;height:48px;border-radius:50%;background:var(--card);border:1.5px solid var(--line);font-size:26px;flex:none}
+.pm{display:flex;gap:10px;justify-content:center;margin:8px 0}
+.or{text-align:center;color:var(--mut);margin:14px 0 0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet{background:var(--bg);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}.grid .avb{width:100%;height:60px}
+.code{font:700 20px ui-monospace,monospace;letter-spacing:3px}
+.tabs{display:flex;background:var(--card);border-radius:999px;padding:4px;margin:12px 0;box-shadow:var(--sh)}
+.tabs button{flex:1;padding:9px;border-radius:999px;background:none;font-weight:600;color:var(--mut)}.tabs button.on{background:var(--pri);color:#06283d}
+.fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:max(18px,calc(50% - 222px));width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;font-size:30px;box-shadow:0 8px 18px rgba(14,165,233,.5)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chips span{background:var(--bg);border-radius:999px;padding:3px 10px;font-size:13px}
+.stp{display:flex;align-items:center;gap:8px;margin:14px 0;font-size:13px;color:var(--mut)}.stp div{display:flex;align-items:center;gap:6px}.stp b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--line)}.stp .on{color:var(--fg);font-weight:700}.stp .on b{background:var(--pri2);color:#fff}.stp i{flex:1;height:2px;background:var(--line)}
+svg{width:100%;height:auto;display:block}.lg{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:8px;font-size:13px}.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.st{display:flex;justify-content:space-between;font-size:14px;margin-top:4px}
+</style></head><body><div id="app">Memuat...</div>
+<script>
+const $=s=>document.querySelector(s),$$=(s,f)=>document.querySelectorAll(s).forEach(f),app=$('#app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rp=n=>(n<0?'-':'')+'Rp'+Math.abs(Math.round(n)).toLocaleString('id-ID');
+const fmt=n=>n?Math.round(n).toLocaleString('id-ID'):'';
+const num=s=>parseInt(String(s).replace(/\D/g,''))||0;
+function mi(el,cb){el.oninput=()=>{const p=el.selectionStart,d=el.value.slice(0,p).replace(/\D/g,'').length,n=num(el.value);el.value=fmt(n);let k=0,c=0;while(c<d&&k<el.value.length){if(/\d/.test(el.value[k]))c++;k++}try{el.setSelectionRange(k,k)}catch(e){}cb(n)}}
+const fd=t=>new Date(t).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+const fdt=t=>new Date(t).toLocaleString('id-ID',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const AV=['🐮','🐱','🐶','🐰','🦊','🐼','🐨','🐯','🦁','🐸','🐵','🐧'];
+const COL=['#38bdf8','#a78bfa','#fb7185','#fbbf24','#34d399','#f472b6','#60a5fa','#fb923c','#2dd4bf','#c084fc'];
+let db=null,C=null,F=null,S={page:'home',code:null,w:null,ex:[],tab:'list',unsub:null,sel:null};
+const PP=()=>S.w.people.map((p,i)=>typeof p==='string'?{name:p,av:i%AV.length}:p);
+const saved=()=>{try{return JSON.parse(localStorage.getItem('sb_w')||'[]')}catch(e){return[]}};
+const remember=(code,name,n)=>{try{localStorage.setItem('sb_w',JSON.stringify([{code,name,n},...saved().filter(x=>x.code!==code)].slice(0,30)))}catch(e){}};
+const stop=()=>{if(S.unsub){S.unsub();S.unsub=null}};
+function modal(h){const m=document.createElement('div');m.className='ov';m.innerHTML='<div class="sheet">'+h+'</div>';m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m);return m}
+const FIREBASE_URL='https://wots-split-bill-default-rtdb.asia-southeast1.firebasedatabase.app'; // contoh: https://nama-project-default-rtdb.asia-southeast1.firebasedatabase.app
+function makeDb(base){
+  if(!base||base.startsWith('ISI_'))return null;
+  base=base.replace(/\/+$/,'');
+  const u=p=>base+'/'+p+'.json';
+  const fix=d=>{if(d&&typeof d==='object')for(const k of['shares','paid'])if(Array.isArray(d[k])){const o={};d[k].forEach((v,i)=>{if(v)o[i]=v});d[k]=o}return d};
+  const snap=(id,d)=>({id,exists:d!=null,data:()=>d==null?undefined:fix(d)});
+  const j=async r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()};
+  const doc=p=>({id:p.split('/').pop(),
+    get:async()=>snap(p.split('/').pop(),await j(await fetch(u(p)))),
+    set:async d=>{await j(await fetch(u(p),{method:'PUT',body:JSON.stringify(d)}))},
+    delete:async()=>{await j(await fetch(u(p),{method:'DELETE'}))}});
+  const collection=p=>({
+    add:async d=>{const r=await j(await fetch(u(p),{method:'POST',body:JSON.stringify(d)}));return doc(p+'/'+r.name)},
+    onSnapshot:(next,err)=>{let last=null;
+      const tick=async()=>{try{const o=await j(await fetch(u(p)));const t=JSON.stringify(o);if(t!==last){last=t;next({docs:Object.entries(o||{}).map(([k,v])=>snap(k,v))})}}catch(e){if(err)err(e)}};
+      tick();const t=setInterval(tick,3000);return()=>clearInterval(t)}});
+  return{doc,collection};
+}
+async function init(){db=makeDb(FIREBASE_URL);home()}
+
+/* HOME */
+function home(){
+  stop();S.page='home';
+  if(!db){app.innerHTML='<div class="pad"><h1>Split Bill</h1><p class="bad">Database belum diatur. Isi FIREBASE_URL di bagian atas script file ini.</p></div>';return}
+  const l=saved();
+  app.innerHTML=`<div class="hero"><h1>Split Bill</h1><p>Patungan jadi lebih mudah</p>
+  <div class="car" id="car">
+   <div class="sl" data-go="create" style="background:linear-gradient(135deg,#38bdf8,#818cf8)"><div><b>Buat wallet baru</b><span>Tambah teman dan mulai catat pengeluaran</span></div><em>🐼</em></div>
+   <div class="sl" data-go="join" style="background:linear-gradient(135deg,#a78bfa,#38bdf8)"><div><b>Gabung wallet</b><span>Punya kode dari teman? Masukkan di sini</span></div><em>🔑</em></div></div>
+  <div class="dots"><i class="on"></i><i></i></div></div>
+  <div class="pad"><h2>Wallet kamu</h2>${l.length?l.map(x=>`<div class="card wl" data-open="${esc(x.code)}"><span class="avs">💸</span><div><b>${esc(x.name)}</b><div class="mut">${x.n?x.n+' anggota · ':''}${esc(x.code)}</div></div><span>›</span></div>`).join(''):'<div class="empty"><em>🐾</em><b>Belum ada wallet</b><span>Buat wallet baru atau gabung dengan kode dari temanmu.</span></div>'}</div>`;
+  $$('[data-go]',e=>e.onclick=()=>e.dataset.go==='join'?joinModal():create());
+  $$('[data-open]',e=>e.onclick=async()=>{const r=await openW(e.dataset.open);if(r)alert(r)});
+  const car=$('#car');car.onscroll=()=>{const i=Math.round(car.scrollLeft/(car.firstElementChild.offsetWidth+10));$$('.dots i',(d,k)=>d.classList.toggle('on',k===i))};
+}
+function joinModal(){
+  const m=modal(`<div class="sp"><h2>Gabung wallet</h2><button class="ib" id="x">✕</button></div><input id="jc" placeholder="Kode unik" autocapitalize="characters"><p class="bad" id="jm"></p><button class="bt" id="jg">Gabung</button>`);
+  m.querySelector('#x').onclick=()=>m.remove();
+  m.querySelector('#jg').onclick=async()=>{const r=await openW(m.querySelector('#jc').value.trim().toUpperCase());if(r)m.querySelector('#jm').textContent=r;else m.remove()};
+}
+
+/* CREATE */
+function create(){S.page='create';C=C||{name:'',rows:[{name:'',av:0},{name:'',av:1}]};drawCreate()}
+function drawCreate(){
+  const R=C.rows;
+  app.innerHTML=`<div class="pad"><button class="ib" id="bk">←</button><h1>Buat wallet</h1><p class="mut">Beri nama wallet dan tambahkan semua anggota yang ikut patungan.</p>
+  <label class="lb">Nama wallet</label><input id="wn" placeholder="Mis. Trip Bali" value="${esc(C.name)}">
+  <label class="lb">Anggota</label>
+  ${R.map((r,i)=>`<div class="mr"><button class="avb" data-pick="${i}">${AV[r.av]}</button><input data-n="${i}" placeholder="Nama orang ${i+1}" value="${esc(r.name)}"></div>`).join('')}
+  <div class="pm">${R.length>1?'<button class="ib" id="mn">−</button>':''}${R.length<20?'<button class="ib" id="pl">+</button>':''}</div>
+  <p class="bad" id="msg"></p><button class="bt" id="mk">Buat wallet</button>
+  <div class="or">atau</div><button class="bs" id="jn">Gabung wallet</button></div>`;
+  $('#bk').onclick=()=>{C=null;home()};$('#jn').onclick=joinModal;
+  $('#wn').oninput=e=>C.name=e.target.value;
+  $$('[data-n]',e=>e.oninput=()=>R[+e.dataset.n].name=e.value);
+  $$('[data-pick]',b=>b.onclick=()=>{const m=modal('<div class="sp"><h2>Pilih avatar</h2><button class="ib" id="x">✕</button></div><div class="grid">'+AV.map((a,k)=>`<button class="avb" data-k="${k}">${a}</button>`).join('')+'</div>');
+    m.querySelector('#x').onclick=()=>m.remove();m.querySelectorAll('[data-k]').forEach(x=>x.onclick=()=>{R[+b.dataset.pick].av=+x.dataset.k;m.remove();drawCreate()})});
+  if($('#pl'))$('#pl').onclick=()=>{R.push({name:'',av:R.length%AV.length});drawCreate()};
+  if($('#mn'))$('#mn').onclick=()=>{R.pop();drawCreate()};
+  $('#mk').onclick=doCreate;
+}
+async function doCreate(){
+  const say=t=>$('#msg').textContent=t,name=C.name.trim(),people=C.rows.map(r=>({name:r.name.trim(),av:r.av}));
+  if(!name)return say('Isi nama wallet.');
+  if(people.some(p=>!p.name))return say('Isi semua nama anggota.');
+  if(new Set(people.map(p=>p.name.toLowerCase())).size<people.length)return say('Nama anggota tidak boleh kembar.');
+  $('#mk').disabled=true;
+  try{
+    const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code,ok=false;
+    for(let t=0;t<6&&!ok;t++){code=Array.from({length:6},()=>A[Math.floor(Math.random()*A.length)]).join('');ok=!(await db.doc('wallets/'+code).get()).exists}
+    if(!ok)throw new Error('Gagal membuat kode, coba lagi.');
+    await db.doc('wallets/'+code).set({name,people,created:Date.now()});
+    C=null;const r=await openW(code);if(r)alert(r);
+  }catch(e){say('Gagal: '+(e.message||e.code));$('#mk').disabled=false}
+}
+async function openW(code){
+  if(!code)return 'Isi kode.';
+  try{
+    const s=await db.doc('wallets/'+code).get();
+    if(!s.exists)return 'Kode tidak ditemukan.';
+    stop();S.code=code;S.w=s.data();S.ex=[];S.tab='list';S.sel=null;F=null;
+    remember(code,S.w.name,S.w.people.length);
+    S.unsub=db.collection('wallets/'+code+'/expenses').onSnapshot(q=>{S.ex=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);if(S.page==='wallet')wallet()},()=>{});
+    wallet();return null;
+  }catch(e){return 'Gagal: '+(e.message||e.code)}
+}
+
+/* WALLET */
+function wallet(){
+  S.page='wallet';const w=S.w,P=PP();
+  app.innerHTML=`<div class="pad"><button class="ib" id="bk">←</button>
+  <div class="card"><h1 style="margin-top:0">${esc(w.name)}</h1><div class="mut">${P.length} anggota · dibuat ${fd(w.created||Date.now())}</div>
+   <div class="sp" style="margin-top:10px"><span class="code">${esc(S.code)}</span><button class="sm" id="cp">Salin</button></div></div>
+  <div class="tabs"><button data-t="list" class="${S.tab==='list'?'on':''}">Pengeluaran</button><button data-t="rep" class="${S.tab==='rep'?'on':''}">Laporan</button></div>
+  <div id="body"></div></div><button class="fab" id="fab">+</button>`;
+  $('#bk').onclick=home;$('#fab').onclick=()=>addStart();
+  $$('[data-t]',b=>b.onclick=()=>{S.tab=b.dataset.t;wallet()});
+  $('#cp').onclick=async()=>{let ok=false;try{await navigator.clipboard.writeText(S.code);ok=true}catch(e){try{const t=document.createElement('textarea');t.value=S.code;document.body.appendChild(t);t.select();ok=document.execCommand('copy');t.remove()}catch(e2){}}$('#cp').textContent=ok?'Tersalin ✓':'Salin manual'};
+  S.tab==='list'?list(P):report(P);
+}
+function list(P){
+  $('#body').innerHTML=S.ex.length?S.ex.map(e=>`<div class="card"><div class="sp"><b style="font-size:17px">${esc(e.name)}</b><div class="sp"><b style="font-size:17px">${rp(e.total)}</b><button class="ib" style="width:32px;height:32px;box-shadow:none" data-more="${e.id}">⋮</button></div></div>
+   <div class="mut">${fdt(e.ts)}</div>
+   <div class="mut" style="margin-top:8px">Dibayar oleh</div><div class="chips">${Object.entries(e.paid).map(([i,a])=>`<span>${AV[P[i].av]} ${esc(P[i].name)} · ${rp(a)}</span>`).join('')}</div>
+   <div class="mut" style="margin-top:8px">Porsi tiap anggota</div><div class="chips">${Object.entries(e.shares).map(([i,a])=>`<span>${AV[P[i].av]} ${esc(P[i].name)} · ${rp(a)}</span>`).join('')}</div></div>`).join('')
+   :'<div class="empty"><em>🧾</em><b>Belum ada pengeluaran</b><span>Tekan tombol + untuk menambah pengeluaran pertama.</span></div>';
+  $$('[data-more]',b=>b.onclick=()=>{const e=S.ex.find(x=>x.id===b.dataset.more);
+    const m=modal(`<h2>${esc(e.name)}</h2><button class="bs" id="ed">Edit</button><button class="bs bad" id="dl">Hapus</button><button class="bs" id="cn">Batal</button>`);
+    m.querySelector('#cn').onclick=()=>m.remove();
+    m.querySelector('#ed').onclick=()=>{m.remove();addStart(e)};
+    m.querySelector('#dl').onclick=async()=>{if(!confirm('Hapus pengeluaran ini?'))return;m.remove();try{await db.doc('wallets/'+S.code+'/expenses/'+e.id).delete()}catch(x){alert(x.message)}}});
+}
+
+/* REPORT */
+function pie(v,P){
+  const t=v.reduce((a,b)=>a+b,0);if(!t)return'';let a=-Math.PI/2;
+  const sl=v.map((x,i)=>{if(!x)return'';const f=x/t,c=COL[i%COL.length];if(f>=.9999)return`<circle cx="80" cy="80" r="70" fill="${c}"/>`;const b=a+f*2*Math.PI;const p=`M80,80 L${80+70*Math.cos(a)},${80+70*Math.sin(a)} A70,70 0 ${f>.5?1:0} 1 ${80+70*Math.cos(b)},${80+70*Math.sin(b)}Z`;a=b;return`<path d="${p}" fill="${c}"/>`}).join('');
+  return`<div class="card"><svg viewBox="0 0 160 160" style="max-width:200px;margin:auto">${sl}</svg><div class="lg">${P.map((p,i)=>`<span><i style="background:${COL[i%COL.length]}"></i>${esc(p.name)} ${Math.round(v[i]/t*100)}%</span>`).join('')}</div></div>`;
+}
+function flows(tx,P){
+  const dm={},cm={},W=360,gap=12,minH=40;
+  tx.forEach(([f,t,m])=>{dm[f]=(dm[f]||0)+m;cm[t]=(cm[t]||0)+m});
+  const tot=tx.reduce((s,x)=>s+x[2],0),sc=240/tot;
+  if(S.sel==null||!dm[S.sel])S.sel=Object.keys(dm)[0];
+  const pos=m=>{let y=4;const o={};Object.keys(m).forEach(i=>{const h=Math.max(m[i]*sc,minH);o[i]={y,h,c:y};y+=h+gap});return[o,y]};
+  const[L,yl]=pos(dm),[R,yr]=pos(cm),H=Math.max(yl,yr);
+  let ps='',on='';
+  tx.forEach(([f,t,m])=>{const a=L[f],b=R[t],h1=a.h*m/dm[f],h2=b.h*m/cm[t],y1=a.c,y2=b.c;a.c+=h1;b.c+=h2;
+    const d=`M14,${y1} C180,${y1} 180,${y2} ${W-14},${y2} L${W-14},${y2+h2} C180,${y2+h2} 180,${y1+h1} 14,${y1+h1}Z`;
+    if(S.sel==f)on+=`<path d="${d}" fill="url(#g)" opacity=".85"/>`;else ps+=`<path d="${d}" fill="var(--line)" opacity=".6"/>`});
+  let nd='';
+  Object.keys(L).forEach(i=>{const n=L[i],s=S.sel==i;nd+=`<g data-sel="${i}" style="cursor:pointer"><rect x="4" y="${n.y}" width="10" height="${n.h}" rx="4" fill="${s?'#38bdf8':'#9d98c9'}"/><rect x="0" y="${n.y}" width="150" height="${n.h}" fill="transparent"/>
+    <text x="22" y="${n.y+n.h/2-1}" font-size="13" font-weight="700" fill="var(--fg)" stroke="var(--card)" stroke-width="4" paint-order="stroke">${AV[P[i].av]} ${esc(P[i].name)}</text>
+    <text x="22" y="${n.y+n.h/2+15}" font-size="12" fill="var(--bad)" stroke="var(--card)" stroke-width="4" paint-order="stroke">${rp(dm[i])}</text></g>`});
+  Object.keys(R).forEach(i=>{const n=R[i];nd+=`<rect x="${W-14}" y="${n.y}" width="10" height="${n.h}" rx="4" fill="#34d399"/>
+    <text x="${W-22}" y="${n.y+n.h/2-1}" text-anchor="end" font-size="13" font-weight="700" fill="var(--fg)" stroke="var(--card)" stroke-width="4" paint-order="stroke">${esc(P[i].name)} ${AV[P[i].av]}</text>
+    <text x="${W-22}" y="${n.y+n.h/2+15}" text-anchor="end" font-size="12" fill="var(--ok)" stroke="var(--card)" stroke-width="4" paint-order="stroke">${rp(cm[i])}</text>`});
+  const mine=tx.filter(x=>x[0]==S.sel);
+  return`<div class="card"><div class="sp mut"><b class="bad">Perlu bayar</b><b class="ok">Perlu dibayar</b></div>
+  <svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="g"><stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs>${ps}${on}${nd}</svg>
+  <p class="mut" style="margin-bottom:0">Tap nama di kiri untuk melihat harus bayar ke siapa.</p>
+  <div style="margin-top:6px"><b>${esc(P[S.sel].name)}</b> bayar ke:${mine.map(([f,t,m])=>`<div class="st"><span>→ ${AV[P[t].av]} ${esc(P[t].name)}</span><b>${rp(m)}</b></div>`).join('')}</div></div>`;
+}
+function report(P){
+  const paid=P.map(()=>0),sh=P.map(()=>0);
+  S.ex.forEach(e=>{for(const i in e.paid)paid[i]+=e.paid[i];for(const i in e.shares)sh[i]+=e.shares[i]});
+  const net=P.map((_,i)=>paid[i]-sh[i]),cr=[],dr=[];
+  net.forEach((n,i)=>n>0?cr.push({i,n}):n<0&&dr.push({i,n:-n}));
+  cr.sort((a,b)=>b.n-a.n);dr.sort((a,b)=>b.n-a.n);
+  const tx=[];let a=0,b=0;
+  while(a<dr.length&&b<cr.length){const m=Math.min(dr[a].n,cr[b].n);tx.push([dr[a].i,cr[b].i,m]);dr[a].n-=m;cr[b].n-=m;if(!dr[a].n)a++;if(!cr[b].n)b++}
+  const total=S.ex.reduce((s,e)=>s+e.total,0);
+  $('#body').innerHTML=`<div class="card sp"><span class="mut">Total pengeluaran</span><b style="font-size:20px">${rp(total)}</b></div>
+  ${pie(sh,P)}<h2>Per anggota</h2>
+  ${P.map((p,i)=>`<div class="card"><div class="mr" style="margin-top:0"><span class="avs">${AV[p.av]}</span><b>${esc(p.name)}</b></div>
+   <div class="st"><span class="mut">Total pengeluaran</span><span>${rp(sh[i])}</span></div>
+   <div class="st"><span class="mut">Total menalangi</span><span>${rp(paid[i])}</span></div>
+   <div class="st"><span class="mut">Selisih</span><b class="${net[i]>=0?'ok':'bad'}">${net[i]>0?'+':''}${rp(net[i])}</b></div></div>`).join('')}
+  <h2>Cara melunasi</h2>${tx.length?flows(tx,P):'<div class="card ok">Semua sudah pas, tidak ada hutang. 🎉</div>'}`;
+  $$('[data-sel]',g=>g.onclick=()=>{S.sel=g.dataset.sel;report(P)});
+}
+
+/* ADD / EDIT EXPENSE */
+const split=(t,n)=>{const b=Math.floor(t/n);let r=t-b*n;return Array.from({length:n},()=>b+(r-->0?1:0))};
+function addStart(e){
+  const P=PP();F={id:e&&e.id,ts:e&&e.ts,name:e?e.name:'',total:e?e.total:0,sh:{},pd:{},step:1,touched:!!e};
+  P.forEach((_,i)=>{F.sh[i]=e?(e.shares[i]||0):0;F.pd[i]=e?(e.paid[i]||0):0});
+  if(!e&&F.total)eq('sh');addPage();
+}
+const eq=g=>{const n=PP().length;split(F.total,n).forEach((v,i)=>F[g][i]=v)};
+const sum=g=>Object.values(F[g]).reduce((a,b)=>a+b,0);
+function addPage(){
+  S.page='add';const P=PP(),s=F.step,g=s===1?'sh':'pd';
+  app.innerHTML=`<div class="pad"><button class="ib" id="bk">←</button>
+  <div class="stp"><div class="${s===1?'on':''}"><b>1</b>Pengeluaran</div><i></i><div class="${s===2?'on':''}"><b>2</b>Pembayaran</div></div>
+  <h1>${s===1?(F.id?'Edit pengeluaran':'Tambah pengeluaran'):'Siapa yang membayar?'}</h1>
+  <p class="mut">${s===1?'Isi nama, total, dan porsi tiap anggota. Isi 0 jika tidak ikut.':'Isi jumlah yang dibayar tiap anggota. Isi 0 jika tidak membayar.'}</p>
+  ${s===1?`<label class="lb">Nama pengeluaran</label><input id="en" placeholder="Mis. Makan malam" value="${esc(F.name)}"><label class="lb">Total (Rp)</label><input id="et" type="text" inputmode="numeric" placeholder="0" value="${fmt(F.total)}">`
+   :`<div class="card sp"><span class="mut">${esc(F.name)}</span><b>${rp(F.total)}</b></div>`}
+  <label class="lb">${s===1?'Porsi tiap anggota':'Pembayaran tiap anggota'}</label>
+  ${P.map((p,i)=>`<div class="mr"><span class="avs">${AV[p.av]}</span><span class="nm">${esc(p.name)}</span><input type="text" inputmode="numeric" placeholder="0" data-i="${i}" value="${fmt(F[g][i])}"></div>`).join('')}
+  <p id="msg" style="font-weight:600"></p><button class="bs" id="eq">Bagi rata</button>
+  <button class="bt" id="nx">${s===1?'Lanjut':(F.id?'Simpan perubahan':'Tambah pengeluaran')}</button></div>`;
+  const upd=()=>{const d=F.total-sum(g);$('#msg').innerHTML=d?`<span class="bad">${d>0?'Kurang':'Lebih'} ${rp(Math.abs(d))}</span>`:'';$('#nx').disabled=!(F.total>0&&F.name.trim()&&!d)};
+  const sync=()=>$$('[data-i]',a=>a.value=fmt(F[g][a.dataset.i]));
+  $('#bk').onclick=()=>{if(s===2){F.step=1;addPage()}else{F=null;wallet()}};
+  if(s===1){$('#en').oninput=e=>{F.name=e.target.value;upd()};
+    mi($('#et'),n=>{F.total=n;if(!F.touched){eq('sh');sync()}upd()})}
+  $$('[data-i]',a=>mi(a,n=>{F[g][a.dataset.i]=n;if(s===1)F.touched=true;upd()}));
+  $('#eq').onclick=()=>{eq(g);if(s===1)F.touched=true;sync();upd()};
+  $('#nx').onclick=()=>{if(s===1){F.step=2;addPage()}else saveEx()};
+  upd();
+}
+async function saveEx(){
+  const pick=g=>Object.fromEntries(Object.entries(F[g]).filter(([,a])=>a>0));
+  const d={name:F.name.trim(),total:F.total,shares:pick('sh'),paid:pick('pd'),ts:F.ts||Date.now()};
+  $('#nx').disabled=true;
+  try{
+    F.id?await db.doc('wallets/'+S.code+'/expenses/'+F.id).set(d):await db.collection('wallets/'+S.code+'/expenses').add(d);
+    F=null;S.tab='list';wallet();
+  }catch(e){alert('Gagal menyimpan: '+(e.message||e.code));$('#nx').disabled=false}
+}
+init();
+</script></body></html>
